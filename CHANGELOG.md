@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-06
+
 ### Added
 
 - Optimistic concurrency: an event is stored only if its version is one more than the last of its aggregate, checked by the
@@ -49,5 +51,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 First release: the `:components/event-store` Integrant component, which makes the `events` table, and `append!`, `get-events`,
 `get-events-by-type`, `get-latest-version` and `get-aggregate-snapshot`.
 
-[Unreleased]: https://github.com/AF2B/borba-event-store-component/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/AF2B/borba-event-store-component/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/AF2B/borba-event-store-component/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/AF2B/borba-event-store-component/releases/tag/v1.0.0
