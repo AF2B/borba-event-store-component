@@ -271,3 +271,32 @@
     (is (= :borba.event-store/no-database
            (try (ig/init-key :components/event-store {})
                 (catch clojure.lang.ExceptionInfo e (:error (ex-data e))))))))
+
+(deftest transaction-test
+  (sql/execute! (ds)
+                ["CREATE TABLE IF NOT EXISTS orders_it (id TEXT PRIMARY KEY)"])
+  (try
+    (testing "a store on the connection of a transaction appends in it"
+      (let [id (aggregate-id)]
+        (sql/transact! (ds)
+                       (fn [tx]
+                         (sql/insert! tx :orders-it {:id id})
+                         (store/append! (assoc (es) :datasource tx)
+                                        (event id 1 {}))))
+        (is (= 1 (store/get-latest-version (es) id)))
+        (is (some? (sql/find-one-by! (ds) :orders-it {:id id})))))
+
+    (testing "when the transaction rolls back, neither the row nor the event
+              is stored"
+      (let [id (aggregate-id)]
+        (is (thrown? clojure.lang.ExceptionInfo
+                     (sql/transact! (ds)
+                                    (fn [tx]
+                                      (sql/insert! tx :orders-it {:id id})
+                                      (store/append! (assoc (es) :datasource tx)
+                                                     (event id 1 {}))
+                                      (throw (ex-info "undo" {}))))))
+        (is (= 0 (store/get-latest-version (es) id)))
+        (is (nil? (sql/find-one-by! (ds) :orders-it {:id id})))))
+    (finally
+      (sql/execute! (ds) ["DROP TABLE IF EXISTS orders_it"]))))

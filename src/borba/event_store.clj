@@ -17,7 +17,14 @@
 
    Events come back as maps with kebab-case keys, with the payload and the
    metadata as data and the time as an Instant, in the order of their
-   :position, which is the order they were stored in, across aggregates."
+   :position, which is the order they were stored in, across aggregates.
+
+   The store is a map of its :datasource, and that map is part of the API: a
+   store whose :datasource is the connection of a transaction of
+   borba.sql-client/transact! appends and reads in that transaction, so the
+   state of an aggregate and its event are stored together or not at all:
+
+     (sql/transact! ds #(es/append! (assoc store :datasource %) event))"
   (:require
    [borba.event-store.codec :as codec]
    [borba.event-store.event :as event]

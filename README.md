@@ -11,7 +11,7 @@ even by a mistake; and the payload comes back as data.
 ```clojure
 io.github.af2b/borba-event-store-component
 {:git/url "https://github.com/AF2B/borba-event-store-component"
- :git/tag "v2.0.0"
+ :git/tag "v2.0.1"
  :git/sha "<the commit of the tag, printed in the release notes>"}
 ```
 
@@ -32,6 +32,27 @@ It depends on Clojure, Integrant, `tools.logging`, [jsonista](https://github.com
 
 The component makes the table when it starts, if there is none, once at a time, so several instances of a service that start together
 do not trip over each other. The value is the store that every function takes first.
+
+### In a transaction
+
+The store is a map of its `:datasource`, the data source of `borba-sql-client-component`, and that map is part of the API. A store whose
+`:datasource` is the connection of a transaction appends and reads in that transaction, so the state of an aggregate and the event that
+explains it are stored together or not at all:
+
+```clojure
+(sql/transact! ds
+               (fn [tx]
+                 (let [order (sql/insert! tx :orders row)]
+                   (es/append! (assoc store :datasource tx)
+                               {:aggregate-id   (:id order)
+                                :aggregate-type "order"
+                                :event-type     "order.created"
+                                :payload        order
+                                :version        1}))))
+```
+
+When the function throws, neither is stored. A `:version-conflict` is returned as data and does not roll back by itself: throw it to
+undo what the transaction wrote before it.
 
 ### Appending
 
