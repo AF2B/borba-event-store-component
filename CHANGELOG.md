@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-22
+
+### Changed
+
+- The value of the component, a map of its `:datasource`, is part of the API: a store whose `:datasource` is the connection of a
+  transaction appends and reads in that transaction, so the state of an aggregate and its event are stored together. The README and
+  the namespace describe it, and the integration suite holds it, with a transaction that commits and one that rolls back.
+
 ## [2.0.0] - 2026-10-06
 
 ### Added
@@ -51,6 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 First release: the `:components/event-store` Integrant component, which makes the `events` table, and `append!`, `get-events`,
 `get-events-by-type`, `get-latest-version` and `get-aggregate-snapshot`.
 
-[Unreleased]: https://github.com/AF2B/borba-event-store-component/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/AF2B/borba-event-store-component/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/AF2B/borba-event-store-component/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/AF2B/borba-event-store-component/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/AF2B/borba-event-store-component/releases/tag/v1.0.0
